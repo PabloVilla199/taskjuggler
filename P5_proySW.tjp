@@ -69,8 +69,8 @@ resource dev2 "Samantha Müller" {
 resource dev3 "Peter Green" {
   email "kkk@unizar.es"
 }
-resource dev4 "Practice Student" {
-  email "student@unizar.es"
+resource dev4 "Pablo Villa" {
+  email "874773@unizar.es"
   rate 80
   limits { dailymax 4h }
 }
