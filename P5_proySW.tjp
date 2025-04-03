@@ -161,7 +161,6 @@ task WMGame "Web & Mobile Game" {
     task tmobDesign "Mobile GUI Design" {
       effort 10d
       allocate dev4, dev3
-      # Removed the redundant depends line here
     }
     task tmobDev "Mobile Development" {
       effort 18d
