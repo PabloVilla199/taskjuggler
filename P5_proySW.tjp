@@ -47,6 +47,7 @@ account cost "Project Cost" {
   account wFront "Web Front-End"
   account mFront "Mobile Front-end"
   account back "Back-End"
+  account cloud "Cloud Deployment"
 }
 account rev "Payments"
 # The Profit&Loss analysis should be rev - cost accounts.
@@ -67,6 +68,11 @@ resource dev2 "Samantha Müller" {
 }
 resource dev3 "Peter Green" {
   email "kkk@unizar.es"
+}
+resource dev4 "Practice Student" {
+  email "student@unizar.es"
+  rate 80
+  limits { dailymax 4h }
 }
 
 # Now we specify the work packages. The whole project is described as
@@ -92,7 +98,7 @@ task WMGame "Web & Mobile Game" {
   }
 
   task tback "Back End" {
-    # It is necessary to “purge” the “chargeset” because it has been assigned previously to other variable 
+    # It is necessary to "purge" the "chargeset" because it has been assigned previously to other variable 
     purge chargeset
     chargeset back
     responsible dev1
@@ -147,6 +153,51 @@ task WMGame "Web & Mobile Game" {
     }    
   }
 
+  # New mobile frontend task
+  task tmobF "Mobile Front End" {
+    purge chargeset
+    chargeset mFront
+    responsible dev4
+    depends WMGame.tback.tBEd
+    task tmobDesign "Mobile GUI Design" {
+      effort 10d
+      allocate dev4, dev3
+      depends WMGame.tback.tBEd
+    }
+    task tmobDev "Mobile Development" {
+      effort 18d
+      allocate dev4, dev2
+      depends WMGame.tmobF.tmobDesign
+    }
+    task tmobTest "Mobile Testing" {
+      effort 8d
+      allocate dev1, dev4
+      depends WMGame.tmobF.tmobDev
+    }
+  }
+
+  # New cloud deployment task
+  task tcloud "Cloud Deployment" {
+    purge chargeset
+    chargeset cloud
+    responsible dev1
+    depends WMGame.tback.tbackDev
+    task tcloudEval "Cloud Provider Evaluation" {
+      effort 5d
+      allocate dev1, boss
+    }
+    task tcloudConfig "Cloud Configuration" {
+      effort 7d
+      allocate dev1, dev4
+      depends WMGame.tcloud.tcloudEval
+    }
+    task tcloudDeploy "Cloud Deployment" {
+      effort 10d
+      allocate dev1, dev4
+      depends WMGame.tcloud.tcloudConfig
+    }
+  }
+
   task ttest "Acceptance tests" {
       effort 10d
       allocate boss
@@ -154,9 +205,16 @@ task WMGame "Web & Mobile Game" {
       actual:effort 20d
       depends WMGame.twebF
       depends WMGame.tback
+      depends WMGame.tmobF
+      depends WMGame.tcloud
+      start 2025-05-15  # Set earliest start date for acceptance tests
+      journalentry 2025-02-25 "Added new mobile and cloud tasks" {
+        author dev4
+        alert green
+        summary "Updated project plan to include mobile frontend and cloud deployment tasks."
       }
+  }
 
-    
   task deliveries "Milestones" {
 
     # Some milestones have customer payments associated with them. We
@@ -252,6 +310,13 @@ textreport frame "" {
     title "Resource Graph"
     center '<[report id="resourceGraph"]>'
   }
+  
+  # New report for initial plan
+  textreport "InitialPlan" {
+    formats html
+    title "Initial Project Plan"
+    center '<[report id="initialPlan"]>'
+  }
 }
 
 # A traditional Gantt chart with a project overview.
@@ -270,6 +335,19 @@ taskreport overview "" {
   caption 'All effort values are in man days.'
 }
 
+# Report showing the initial plan (scenario plan)
+taskreport initialPlan "" {
+  scenarios plan
+  headline "Initial Project Plan"
+  columns bsi { title 'WBS' },
+          name, start, end, effort, cost,
+          revenue, chart { ${TaskTip} }
+  timeformat "%a %Y-%m-%d"
+  loadunit days
+  hideresource @all
+  balance cost rev
+  caption 'Initial plan values (before adjustments). All effort values are in man days.'
+}
 
 # Macro to set the background color of a cell according to the alert
 # level of the task.
