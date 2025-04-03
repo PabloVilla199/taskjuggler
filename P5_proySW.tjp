@@ -152,17 +152,16 @@ task WMGame "Web & Mobile Game" {
       depends WMGame.twebF.tFEc
     }    
   }
-
-  # New mobile frontend task
+    # New mobile frontend task
   task tmobF "Mobile Front End" {
     purge chargeset
     chargeset mFront
     responsible dev4
-    depends WMGame.tback.tBEd
+    depends WMGame.tback.tBEd  # This is the only place we need this dependency
     task tmobDesign "Mobile GUI Design" {
       effort 10d
       allocate dev4, dev3
-      depends WMGame.tback.tBEd
+      # Removed the redundant depends line here
     }
     task tmobDev "Mobile Development" {
       effort 18d
