@@ -196,22 +196,17 @@ task WMGame "Web & Mobile Game" {
     }
   }
 
-  task ttest "Acceptance tests" {
-      effort 10d
-      allocate boss
-      allocate dev2
-      actual:effort 20d
-      depends WMGame.twebF
-      depends WMGame.tback
-      depends WMGame.tmobF
-      depends WMGame.tcloud
-      start 2025-05-15  # Set earliest start date for acceptance tests
-      journalentry 2025-02-25 "Added new mobile and cloud tasks" {
-        author dev4
-        alert green
-        summary "Updated project plan to include mobile frontend and cloud deployment tasks."
-      }
-  }
+task ttest "Acceptance tests" {
+    effort 10d
+    allocate boss
+    allocate dev2
+    actual:effort 20d
+    depends WMGame.twebF
+    depends WMGame.tback
+    depends WMGame.tmobF
+    depends WMGame.tcloud
+    start 2025-05-01  # Moved earlier by 2 weeks
+}
 
   task deliveries "Milestones" {
 
